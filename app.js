@@ -2,8 +2,14 @@ const express = require('express');
 var server = express();
 var router = express.Router();
 var user = require('./router/user');
-var about = require('./router/about');
+// var about = require('./router/about');
+const path = require('path');
+const bodyParse = require('body-parser');
+var multer = require("multer");
 require('./model/db')
+
+server.use('/uploads', express.static(__dirname + '/uploads'))
+
 
 
 server.all('*', function(req, res, next) {
@@ -18,10 +24,13 @@ server.all('*', function(req, res, next) {
 //     console.log(111111)
 //     response.send('请求通过！')
 // });
-
-// app.use(bodyParse.urlencoded({extended:false}))
-
+const upload = multer({dest: __dirname + '/uploads'})
 server.use('/user', user);
+server.post('/upload',upload.single('file'), async (req, res) => {
+    const file = req.file
+    file.url = `http://localhost:3000/uploads/${file.filename}`
+    res.send(file)
+})
 
 
 
